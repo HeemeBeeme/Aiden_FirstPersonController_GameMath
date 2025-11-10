@@ -38,7 +38,8 @@ public class FirstPersonController : MonoBehaviour
             mouseX += CameraSensitivity * Input.GetAxisRaw("Mouse X");
             mouseY -= CameraSensitivity * Input.GetAxisRaw("Mouse Y");
 
-            MainCamera.transform.eulerAngles = new Vector3(mouseY, mouseX, CameraZClamp);
+            MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
+            transform.eulerAngles = new Vector3(0, mouseX, 0);
 
             CurrentCameraXRotation = MainCamera.transform.localRotation.eulerAngles.x;
             CurrentCameraYRotation = MainCamera.transform.localRotation.eulerAngles.y;
