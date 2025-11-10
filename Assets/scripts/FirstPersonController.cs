@@ -8,7 +8,10 @@ public class FirstPersonController : MonoBehaviour
 
     public float PlayerWalkSpeed = 3f;
     public float PlayerRunSpeed = 5f;
+    public float PlayerCrouchSpeed = 1f;
     public float PlayerSpeed;
+
+    private CharacterController cc;
 
     private float H;
     private float V;
@@ -29,6 +32,7 @@ public class FirstPersonController : MonoBehaviour
 
     void Start()
     {
+        cc = GetComponent<CharacterController>();
         PlayerSpeed = PlayerWalkSpeed;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -47,20 +51,29 @@ public class FirstPersonController : MonoBehaviour
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetAxisRaw("Run") == 1)
             {
                 PlayerSpeed = PlayerRunSpeed;
+            }
+            else if (Input.GetAxisRaw("Crouch") == 1)
+            {
+                PlayerSpeed = PlayerCrouchSpeed;
+                MainCamera.transform.localPosition = Vector3.zero;
             }
             else
             {
                 PlayerSpeed = PlayerWalkSpeed;
+                MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
             }
 
             //moves the player
             Vector3 input = new Vector3(H, 0f, V);
             transform.Translate(input * PlayerSpeed * Time.deltaTime, Space.Self);
 
-
+            if (cc.isGrounded && Input.GetAxisRaw("Jump") == 1)
+            {
+                
+            }
         }
 
         //unlocks the mouse
@@ -78,4 +91,5 @@ public class FirstPersonController : MonoBehaviour
             InputAllowed = true;
         }
     }
+
 }
