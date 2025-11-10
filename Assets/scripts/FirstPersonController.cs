@@ -7,27 +7,27 @@ public class FirstPersonController : MonoBehaviour
     public Camera MainCamera;
 
     //current up and down rotation
-    private float CurrentCameraXRotation;
+    private float CurrentCameraXRotation = 0;
 
     //current left and right rotation
-    private float CurrentCameraYRotation;
+    private float CurrentCameraYRotation = 0;
 
-    public float mouseXPosition;
-    public float mouseYPosition;
+    //sets the Z axis indefinitely
+    private int CameraZClamp = 0;
 
-    private float mouseX;
-    private float mouseY;
+    //mouse x axis
+    private float mouseX = 0;
+    //mouse y axis
+    private float mouseY = 0;
 
-    public float CameraXSensitivity = 1f;
-    public float CameraYSensitivity = 1f;
+    //camera sensitivity
+    public float CameraSensitivity = 1f;
 
     //does the mouse input affect the camera rotation
     private bool CameraActive = true;
 
     void Start()
     {
-        CurrentCameraXRotation = MainCamera.transform.rotation.x;
-        CurrentCameraYRotation = MainCamera.transform.rotation.y;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -35,13 +35,13 @@ public class FirstPersonController : MonoBehaviour
     {
         if(CameraActive)
         {
-            mouseX = Input.GetAxis("Mouse X");
-            mouseY = Input.GetAxis("Mouse Y") * -1;
+            mouseX += CameraSensitivity * Input.GetAxisRaw("Mouse X");
+            mouseY -= CameraSensitivity * Input.GetAxisRaw("Mouse Y");
 
-            mouseXPosition = CameraXSensitivity * mouseX;
-            mouseYPosition = CameraYSensitivity * mouseY;
+            MainCamera.transform.eulerAngles = new Vector3(mouseY, mouseX, CameraZClamp);
 
-            MainCamera.transform.Rotate(mouseYPosition, mouseXPosition, 0);
+            CurrentCameraXRotation = MainCamera.transform.localRotation.eulerAngles.x;
+            CurrentCameraYRotation = MainCamera.transform.localRotation.eulerAngles.y;
         }
 
         //unlocks the mouse
