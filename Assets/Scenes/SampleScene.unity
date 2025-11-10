@@ -754,6 +754,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 330585545}
+  PlayerWalkSpeed: 3
+  PlayerRunSpeed: 5
   PlayerSpeed: 3
   CameraSensitivity: 1
 --- !u!4 &2107595994

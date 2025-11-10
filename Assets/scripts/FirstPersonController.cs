@@ -6,7 +6,9 @@ public class FirstPersonController : MonoBehaviour
 
     public Camera MainCamera;
 
-    public float PlayerSpeed = 3f;
+    public float PlayerWalkSpeed = 3f;
+    public float PlayerRunSpeed = 5f;
+    public float PlayerSpeed;
 
     private float H;
     private float V;
@@ -27,6 +29,7 @@ public class FirstPersonController : MonoBehaviour
 
     void Start()
     {
+        PlayerSpeed = PlayerWalkSpeed;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -44,9 +47,20 @@ public class FirstPersonController : MonoBehaviour
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                PlayerSpeed = PlayerRunSpeed;
+            }
+            else
+            {
+                PlayerSpeed = PlayerWalkSpeed;
+            }
+
             //moves the player
             Vector3 input = new Vector3(H, 0f, V);
             transform.Translate(input * PlayerSpeed * Time.deltaTime, Space.Self);
+
+
         }
 
         //unlocks the mouse
