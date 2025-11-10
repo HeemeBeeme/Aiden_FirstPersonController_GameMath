@@ -6,11 +6,10 @@ public class FirstPersonController : MonoBehaviour
 
     public Camera MainCamera;
 
-    //current up and down rotation
-    private float CurrentCameraXRotation = 0;
+    public float PlayerSpeed = 3f;
 
-    //current left and right rotation
-    private float CurrentCameraYRotation = 0;
+    private float H;
+    private float V;
 
     //sets the Z axis indefinitely
     private int CameraZClamp = 0;
@@ -21,10 +20,10 @@ public class FirstPersonController : MonoBehaviour
     private float mouseY = 0;
 
     //camera sensitivity
-    public float CameraSensitivity = 1f;
+    public float CameraSensitivity = 2f;
 
     //does the mouse input affect the camera rotation
-    private bool CameraActive = true;
+    private bool InputAllowed = true;
 
     void Start()
     {
@@ -33,31 +32,36 @@ public class FirstPersonController : MonoBehaviour
     }
     void Update()
     {
-        if(CameraActive)
+        H = Input.GetAxisRaw("Horizontal");
+        V = Input.GetAxisRaw("Vertical");
+
+        if (InputAllowed)
         {
+            //turns mouse input into rotation data (rotates camera and player model)
             mouseX += CameraSensitivity * Input.GetAxisRaw("Mouse X");
             mouseY -= CameraSensitivity * Input.GetAxisRaw("Mouse Y");
 
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
-            CurrentCameraXRotation = MainCamera.transform.localRotation.eulerAngles.x;
-            CurrentCameraYRotation = MainCamera.transform.localRotation.eulerAngles.y;
+            //moves the player
+            Vector3 input = new Vector3(H, 0f, V);
+            transform.Translate(input * PlayerSpeed * Time.deltaTime, Space.Self);
         }
 
         //unlocks the mouse
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            CameraActive = false;
+            InputAllowed = false;
         }
         //locks the mouse
         else if(Input.GetMouseButtonDown(0))
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            CameraActive = true;
+            InputAllowed = true;
         }
     }
 }
