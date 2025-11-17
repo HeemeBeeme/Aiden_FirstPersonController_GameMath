@@ -136,7 +136,7 @@ public class FirstPersonController : MonoBehaviour
             {
                 VerticalSpeed = GroundedVerticalSpeed;
 
-                if(Input.GetKeyDown(KeyCode.Space))
+                if(Input.GetKey(KeyCode.Space))
                 {
                     VerticalSpeed = JumpIntensity;
                 }
