@@ -13,15 +13,15 @@ public class FirstPersonController : MonoBehaviour
 
     private CharacterController cc;
 
+    //horizontal and vertical movement
     private float H;
     private float V;
 
-    //sets the Z axis indefinitely
+    //clamps the cameras Z axis
     private int CameraZClamp = 0;
 
-    //mouse x axis
+    //mouse axis
     private float mouseX = 0;
-    //mouse y axis
     private float mouseY = 0;
 
     //camera sensitivity
@@ -29,6 +29,12 @@ public class FirstPersonController : MonoBehaviour
 
     //does the mouse input affect the camera rotation
     private bool InputAllowed = true;
+
+    public float JumpIntensity = 2;
+    private Vector3 Movement;
+
+    private float Gravity = -9.81f;
+    private float VerticalSpeed = 0f;
 
     void Start()
     {
@@ -66,14 +72,28 @@ public class FirstPersonController : MonoBehaviour
                 MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
             }
 
+            if (cc.isGrounded)
+            {
+                VerticalSpeed = -1f;
+
+                if(Input.GetKeyDown(KeyCode.Space))
+                {
+                    VerticalSpeed = JumpIntensity;
+                }
+            }
+            else
+            {
+                VerticalSpeed += Gravity * Time.deltaTime;
+            }
+
             //moves the player using the CharacterController component
             Vector3 HorizontalDirection = transform.right * H;
             Vector3 VerticalDirection = transform.forward * V;
 
             Vector3 MoveDirection = (HorizontalDirection + VerticalDirection).normalized;
-            Vector3 Movement = MoveDirection * PlayerSpeed * Time.deltaTime;
-
-            cc.Move(Movement);
+            Movement = MoveDirection * PlayerSpeed;
+            Movement.y = VerticalSpeed;
+            cc.Move(Movement * Time.deltaTime);
         }
 
         //unlocks the mouse

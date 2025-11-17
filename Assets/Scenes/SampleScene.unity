@@ -872,6 +872,9 @@ MonoBehaviour:
   PlayerCrouchSpeed: 1
   PlayerSpeed: 3
   CameraSensitivity: 1
+  JumpIntensity: 3
+  Gravity: -9.81
+  VerticalSpeed: 0
 --- !u!4 &2107595994
 Transform:
   m_ObjectHideFlags: 0
