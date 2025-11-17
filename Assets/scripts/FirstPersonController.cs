@@ -57,14 +57,27 @@ public class FirstPersonController : MonoBehaviour
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
-            if (Input.GetAxisRaw("Run") == 1)
+            //player run
+            if (Input.GetAxisRaw("Crouch") == 1)
             {
-                PlayerSpeed = PlayerRunSpeed;
+                if (Input.GetAxisRaw("Run") == 0)
+                {
+                    PlayerSpeed = PlayerCrouchSpeed;
+                    MainCamera.transform.localPosition = Vector3.zero;
+                }
+                else
+                {
+                    PlayerSpeed = PlayerRunSpeed;
+                    MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
+                }
+                
             }
-            else if (Input.GetAxisRaw("Crouch") == 1)
+            else if (Input.GetAxisRaw("Run") == 1)
             {
-                PlayerSpeed = PlayerCrouchSpeed;
-                MainCamera.transform.localPosition = Vector3.zero;
+                if(Input.GetAxisRaw("Crouch") == 0)
+                {
+                    PlayerSpeed = PlayerRunSpeed;
+                }
             }
             else
             {
