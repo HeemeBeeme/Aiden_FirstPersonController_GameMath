@@ -66,14 +66,14 @@ public class FirstPersonController : MonoBehaviour
                 MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
             }
 
-            //moves the player
-            Vector3 input = new Vector3(H, 0f, V);
-            transform.Translate(input * PlayerSpeed * Time.deltaTime, Space.Self);
+            //moves the player using the CharacterController component
+            Vector3 HorizontalDirection = transform.right * H;
+            Vector3 VerticalDirection = transform.forward * V;
 
-            if (cc.isGrounded && Input.GetAxisRaw("Jump") == 1)
-            {
-                
-            }
+            Vector3 MoveDirection = (HorizontalDirection + VerticalDirection).normalized;
+            Vector3 Movement = MoveDirection * PlayerSpeed * Time.deltaTime;
+
+            cc.Move(Movement);
         }
 
         //unlocks the mouse
