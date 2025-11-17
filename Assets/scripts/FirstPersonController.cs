@@ -6,11 +6,21 @@ public class FirstPersonController : MonoBehaviour
 
     public Camera MainCamera;
 
-    public float PlayerWalkSpeed = 3f;
-    public float PlayerRunSpeed = 5f;
-    public float PlayerCrouchSpeed = 1f;
-    public float PlayerSpeed;
+    [Header("Movement Speeds")]
+    public float WalkSpeed = 3f;
+    public float RunSpeed = 5f;
+    public float CrouchSpeed = 1f;
+    public float SpeedIntensityChange = 4;
 
+    [Header("Other Useful Settings")]
+    public float MouseSensitivity = 2f;
+    public float JumpIntensity = 4;
+    public float CrouchHeight = 0.5f;
+
+    //current player speed
+    private float Speed;
+
+    //character controller component
     private CharacterController cc;
 
     //horizontal and vertical movement
@@ -24,22 +34,21 @@ public class FirstPersonController : MonoBehaviour
     private float mouseX = 0;
     private float mouseY = 0;
 
-    //camera sensitivity
-    public float CameraSensitivity = 2f;
-
     //does the mouse input affect the camera rotation
     private bool InputAllowed = true;
 
-    public float JumpIntensity = 2;
+    //vector that determines movement direction
     private Vector3 Movement;
 
-    private float Gravity = -9.81f;
-    private float VerticalSpeed = 0f;
+    //gravity intensity and the actual force pushing the player down
+    private float GravityIntensity = -9.81f;
+    private float GroundedVerticalSpeed = -1f;
+    private float VerticalSpeed = -1f;
 
     void Start()
     {
         cc = GetComponent<CharacterController>();
-        PlayerSpeed = PlayerWalkSpeed;
+        Speed = WalkSpeed;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -51,43 +60,81 @@ public class FirstPersonController : MonoBehaviour
         if (InputAllowed)
         {
             //turns mouse input into rotation data (rotates camera and player model)
-            mouseX += CameraSensitivity * Input.GetAxisRaw("Mouse X");
-            mouseY -= CameraSensitivity * Input.GetAxisRaw("Mouse Y");
+            mouseX += MouseSensitivity * Input.GetAxisRaw("Mouse X");
+            mouseY -= MouseSensitivity * Input.GetAxisRaw("Mouse Y");
 
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
-            //player run
+            //player crouch
             if (Input.GetAxisRaw("Crouch") == 1)
             {
                 if (Input.GetAxisRaw("Run") == 0)
                 {
-                    PlayerSpeed = PlayerCrouchSpeed;
                     MainCamera.transform.localPosition = Vector3.zero;
+
+                    if(Speed <= CrouchSpeed)
+                    {
+                        Speed = CrouchSpeed;
+                    }
+                    else
+                    {
+                        Speed -= SpeedIntensityChange * Time.deltaTime;
+                    }
                 }
                 else
                 {
-                    PlayerSpeed = PlayerRunSpeed;
-                    MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
+                    MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
+
+                    if (Speed >= WalkSpeed)
+                    {
+                        Speed = WalkSpeed;
+                    }
+                    else
+                    {
+                        Speed += SpeedIntensityChange * Time.deltaTime;
+                    }
                 }
                 
             }
+            //player run
             else if (Input.GetAxisRaw("Run") == 1)
             {
                 if(Input.GetAxisRaw("Crouch") == 0)
                 {
-                    PlayerSpeed = PlayerRunSpeed;
+                    if (Speed >= RunSpeed)
+                    {
+                        Speed = RunSpeed;
+                    }
+                    else
+                    {
+                        Speed += SpeedIntensityChange * Time.deltaTime;
+                    }
                 }
             }
+            //player walk
             else
             {
-                PlayerSpeed = PlayerWalkSpeed;
-                MainCamera.transform.localPosition = new Vector3(0, 0.5f, 0);
+                MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
+
+                if(Speed > WalkSpeed - 0.1f && Speed < WalkSpeed + 0.1f)
+                {
+                    Speed = WalkSpeed;
+                }
+                else if(Speed > WalkSpeed)
+                {
+                    Speed -= SpeedIntensityChange * Time.deltaTime;
+                }
+                else if(Speed < WalkSpeed)
+                {
+                    Speed += SpeedIntensityChange * Time.deltaTime;
+                }
             }
 
+            //jump & gravity
             if (cc.isGrounded)
             {
-                VerticalSpeed = -1f;
+                VerticalSpeed = GroundedVerticalSpeed;
 
                 if(Input.GetKeyDown(KeyCode.Space))
                 {
@@ -96,7 +143,7 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                VerticalSpeed += Gravity * Time.deltaTime;
+                VerticalSpeed += GravityIntensity * Time.deltaTime;
             }
 
             //moves the player using the CharacterController component
@@ -104,7 +151,7 @@ public class FirstPersonController : MonoBehaviour
             Vector3 VerticalDirection = transform.forward * V;
 
             Vector3 MoveDirection = (HorizontalDirection + VerticalDirection).normalized;
-            Movement = MoveDirection * PlayerSpeed;
+            Movement = MoveDirection * Speed;
             Movement.y = VerticalSpeed;
             cc.Move(Movement * Time.deltaTime);
         }

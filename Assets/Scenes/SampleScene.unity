@@ -1902,9 +1902,10 @@ MonoBehaviour:
   PlayerWalkSpeed: 3
   PlayerRunSpeed: 5
   PlayerCrouchSpeed: 1
-  PlayerSpeed: 3
-  CameraSensitivity: 1
+  PlayerSpeedChangeIntensity: 4
+  MouseSensitivity: 2
   JumpIntensity: 4
+  CrouchHeight: 0.5
 --- !u!4 &2107595994
 Transform:
   m_ObjectHideFlags: 0
