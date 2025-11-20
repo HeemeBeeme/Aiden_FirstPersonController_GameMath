@@ -23,6 +23,13 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 ccCrouchPos = new Vector3(0, -0.5f, 0);
     private Vector3 ccInitialPos = new Vector3(0, 0, 0);
 
+    public bool isCrouched = false;
+    public bool isRunning = false;
+    public bool isWalking = true;
+
+    //can the player stand?
+    public bool canStand = true;
+
     //current player speed
     public float Speed;
 
@@ -55,7 +62,6 @@ public class FirstPersonController : MonoBehaviour
 
     //does the mouse input affect the camera rotation
     private bool InputAllowed = true;
-
     //vector that determines movement direction
     private Vector3 Movement;
 
@@ -81,9 +87,28 @@ public class FirstPersonController : MonoBehaviour
         PlayerMesh.transform.localScale = new Vector3(PlayerInitialScale.x, PlayerScaleCrouch, PlayerInitialScale.z);
         cc.height = ccCrouchHeight;
         cc.center = ccCrouchPos;
+
+        //clamps the player speed
+        if (Speed <= CrouchSpeed)
+        {
+            Speed = CrouchSpeed;
+        }
+
+        //changes player speed if on the ground (cant accelerate or decelerate in air)
+        if (cc.isGrounded)
+        {
+            if (!(Speed <= CrouchSpeed))
+            {
+                Speed -= SpeedIntensityChange * Time.deltaTime;
+            }
+        }
+
+        isCrouched = true;
+        isWalking = false;
+        isRunning = false;
     }
 
-    void ResetCrouch()
+    void Run()
     {
         //moves the camera, visor/eyes, the player mesh and CharacterController back to their original transforms
         MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
@@ -92,6 +117,54 @@ public class FirstPersonController : MonoBehaviour
         PlayerMesh.transform.localScale = PlayerInitialScale;
         cc.height = ccInitialHeight;
         cc.center = ccInitialPos;
+
+        if (Speed >= RunSpeed)
+        {
+            Speed = RunSpeed;
+        }
+
+        if (cc.isGrounded)
+        {
+            if (!(Speed >= RunSpeed))
+            {
+                Speed += SpeedIntensityChange * Time.deltaTime;
+            }
+        }
+
+        isCrouched = false;
+        isWalking = false;
+        isRunning = true;
+    }
+
+    void Walk()
+    {
+        MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
+        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        PlayerMesh.transform.localPosition = PlayerInitialPos;
+        PlayerMesh.transform.localScale = PlayerInitialScale;
+        cc.height = ccInitialHeight;
+        cc.center = ccInitialPos;
+
+        if (cc.isGrounded)
+        {
+            if (Speed > WalkSpeed)
+            {
+                Speed -= SpeedIntensityChange * Time.deltaTime;
+            }
+            else if (Speed < WalkSpeed)
+            {
+                Speed += SpeedIntensityChange * Time.deltaTime;
+            }
+
+            if (Speed > (WalkSpeed - 0.1f) && Speed < (WalkSpeed + 0.1f))
+            {
+                Speed = WalkSpeed;
+            }
+        }
+
+        isCrouched = false;
+        isWalking = true;
+        isRunning = false;
     }
 
 
@@ -110,87 +183,42 @@ public class FirstPersonController : MonoBehaviour
             MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, CameraYClamp.Item1, CameraYClamp.Item2), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
+            
             //player crouch
             if (Input.GetAxisRaw("Crouch") == 1)
             {
-                if (Input.GetAxisRaw("Run") == 0)
+                if (canStand)
                 {
-                    Crouch();
-
-                    //clamps the player speed
-                    if (Speed <= CrouchSpeed)
+                    if (Input.GetAxisRaw("Run") == 0)
                     {
-                        Speed = CrouchSpeed;
+                        Crouch();
                     }
-
-                    //changes player speed if on the ground (cant accelerate or decelerate in air)
-                    if (cc.isGrounded)
+                    else
                     {
-                        if(!(Speed <= CrouchSpeed))
-                        {
-                            Speed -= SpeedIntensityChange * Time.deltaTime;
-                        }
+                        Run();
                     }
                 }
-                else
-                {
-                    ResetCrouch();
-
-                    if (Speed >= RunSpeed)
-                    {
-                        Speed = RunSpeed;
-                    }
-
-                    if (cc.isGrounded)
-                    {
-                        if (!(Speed >= RunSpeed))
-                        {
-                            Speed += SpeedIntensityChange * Time.deltaTime;
-                        }
-                    }
-                }
-                
             }
             //player run
             else if (Input.GetAxisRaw("Run") == 1)
             {
-                if(Input.GetAxisRaw("Crouch") == 0)
+                if(canStand)
                 {
-                    if (Speed >= RunSpeed)
-                    {
-                        Speed = RunSpeed;
-                    }
-
-                    if (cc.isGrounded)
-                    {
-                        if(!(Speed >= RunSpeed))
-                        {
-                            Speed += SpeedIntensityChange * Time.deltaTime;
-                        }
-                    }
+                    Run();
                 }
             }
             //player walk
             else
             {
-                ResetCrouch();
-
-                if (cc.isGrounded)
+                if(canStand)
                 {
-                    if (Speed > WalkSpeed)
-                    {
-                        Speed -= SpeedIntensityChange * Time.deltaTime;
-                    }
-                    else if (Speed < WalkSpeed)
-                    {
-                        Speed += SpeedIntensityChange * Time.deltaTime;
-                    }
-
-                    if(Speed > (WalkSpeed - 0.1f) && Speed < (WalkSpeed + 0.1f))
-                    {
-                        Speed = WalkSpeed;
-                    }
+                    Walk();
                 }
+            }
+
+            if(!canStand)
+            {
+                Crouch();
             }
 
             //jump & gravity
