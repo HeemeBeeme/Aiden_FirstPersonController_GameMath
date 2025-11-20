@@ -35,12 +35,12 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("Movement Speeds")]
     public float WalkSpeed = 3f;
-    public float RunSpeed = 5f;
+    public float RunSpeed = 6f;
     public float CrouchSpeed = 1f;
-    public float SpeedIntensityChange = 4;
+    public float SpeedIntensityChange = 6;
 
     [Header("Other Useful Settings")]
-    public float MouseSensitivity = 2f;
+    public float MouseSensitivity = 1f;
     public float JumpIntensity = 4;
 
 

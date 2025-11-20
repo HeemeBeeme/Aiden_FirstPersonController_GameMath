@@ -3659,15 +3659,17 @@ MonoBehaviour:
   MainCamera: {fileID: 330585545}
   Visor: {fileID: 2048900197}
   PlayerMesh: {fileID: 532102380}
+  isCrouched: 0
+  isRunning: 0
+  isWalking: 1
+  canStand: 1
   Speed: 0
   WalkSpeed: 3
   RunSpeed: 6
   CrouchSpeed: 1
-  SpeedIntensityChange: 4
+  SpeedIntensityChange: 6
   MouseSensitivity: 1
   JumpIntensity: 4
-  CrouchHeight: 0.5
-  canStand: 1
 --- !u!4 &2107595994
 Transform:
   m_ObjectHideFlags: 0
