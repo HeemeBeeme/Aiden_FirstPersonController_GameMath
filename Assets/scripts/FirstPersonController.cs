@@ -6,6 +6,9 @@ public class FirstPersonController : MonoBehaviour
 
     public Camera MainCamera;
 
+    //current player speed
+    public float Speed;
+
     [Header("Movement Speeds")]
     public float WalkSpeed = 3f;
     public float RunSpeed = 5f;
@@ -17,8 +20,6 @@ public class FirstPersonController : MonoBehaviour
     public float JumpIntensity = 4;
     public float CrouchHeight = 0.5f;
 
-    //current player speed
-    private float Speed;
 
     //character controller component
     private CharacterController cc;
@@ -87,9 +88,9 @@ public class FirstPersonController : MonoBehaviour
                 {
                     MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
 
-                    if (Speed >= WalkSpeed)
+                    if (Speed >= RunSpeed)
                     {
-                        Speed = WalkSpeed;
+                        Speed = RunSpeed;
                     }
                     else
                     {
