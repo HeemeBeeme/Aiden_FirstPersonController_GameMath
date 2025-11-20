@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,6 +6,22 @@ public class FirstPersonController : MonoBehaviour
 {
 
     public Camera MainCamera;
+
+    public GameObject Visor;
+    private float VisorPosInitialX = 0f;
+    private float VisorPosInitialZ = 0.264f;
+
+
+    public GameObject PlayerMesh;
+    private Vector3 PlayerInitialScale = new Vector3(1, 1, 1);
+    private Vector3 PlayerInitialPos = new Vector3(0, 0, 0);
+    private float PlayerPosCrouch = -0.5f;
+    private float PlayerScaleCrouch = 0.5f;
+
+    private int ccCrouchHeight = 1;
+    private int ccInitialHeight = 2;
+    private Vector3 ccCrouchPos = new Vector3(0, -0.5f, 0);
+    private Vector3 ccInitialPos = new Vector3(0, 0, 0);
 
     //current player speed
     public float Speed;
@@ -28,8 +45,9 @@ public class FirstPersonController : MonoBehaviour
     private float H;
     private float V;
 
-    //clamps the cameras Z axis
+    //clamps the camera axis
     private int CameraZClamp = 0;
+    private (int, int) CameraYClamp = (-85, 85);
 
     //mouse axis
     private float mouseX = 0;
@@ -54,6 +72,29 @@ public class FirstPersonController : MonoBehaviour
         Cursor.visible = false;
     }
 
+    void Crouch()
+    {
+        //moves the camera, visor/eyes, and scales the player mesh and CharacterController down
+        MainCamera.transform.localPosition = Vector3.zero;
+        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        PlayerMesh.transform.localPosition = new Vector3(PlayerInitialPos.x, PlayerPosCrouch, PlayerInitialPos.z);
+        PlayerMesh.transform.localScale = new Vector3(PlayerInitialScale.x, PlayerScaleCrouch, PlayerInitialScale.z);
+        cc.height = ccCrouchHeight;
+        cc.center = ccCrouchPos;
+    }
+
+    void ResetCrouch()
+    {
+        //moves the camera, visor/eyes, the player mesh and CharacterController back to their original transforms
+        MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
+        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        PlayerMesh.transform.localPosition = PlayerInitialPos;
+        PlayerMesh.transform.localScale = PlayerInitialScale;
+        cc.height = ccInitialHeight;
+        cc.center = ccInitialPos;
+    }
+
+
     void Update()
     {
         H = Input.GetAxisRaw("Horizontal");
@@ -65,7 +106,8 @@ public class FirstPersonController : MonoBehaviour
             mouseX += MouseSensitivity * Input.GetAxisRaw("Mouse X");
             mouseY -= MouseSensitivity * Input.GetAxisRaw("Mouse Y");
 
-            MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, -75, 75), mouseX, CameraZClamp);
+            //handles the camera rotation clamping
+            MainCamera.transform.eulerAngles = new Vector3(mouseY = Mathf.Clamp(mouseY, CameraYClamp.Item1, CameraYClamp.Item2), mouseX, CameraZClamp);
             transform.eulerAngles = new Vector3(0, mouseX, 0);
 
             //player crouch
@@ -73,13 +115,15 @@ public class FirstPersonController : MonoBehaviour
             {
                 if (Input.GetAxisRaw("Run") == 0)
                 {
-                    MainCamera.transform.localPosition = Vector3.zero;
+                    Crouch();
 
+                    //clamps the player speed
                     if (Speed <= CrouchSpeed)
                     {
                         Speed = CrouchSpeed;
                     }
 
+                    //changes player speed if on the ground (cant accelerate or decelerate in air)
                     if (cc.isGrounded)
                     {
                         if(!(Speed <= CrouchSpeed))
@@ -90,7 +134,7 @@ public class FirstPersonController : MonoBehaviour
                 }
                 else
                 {
-                    MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
+                    ResetCrouch();
 
                     if (Speed >= RunSpeed)
                     {
@@ -129,12 +173,7 @@ public class FirstPersonController : MonoBehaviour
             //player walk
             else
             {
-                MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
-
-                if (Speed > WalkSpeed - 0.1f || Speed < WalkSpeed + 0.1f)
-                {
-                    Speed = WalkSpeed;
-                }
+                ResetCrouch();
 
                 if (cc.isGrounded)
                 {
@@ -145,6 +184,11 @@ public class FirstPersonController : MonoBehaviour
                     else if (Speed < WalkSpeed)
                     {
                         Speed += SpeedIntensityChange * Time.deltaTime;
+                    }
+
+                    if(Speed > (WalkSpeed - 0.1f) && Speed < (WalkSpeed + 0.1f))
+                    {
+                        Speed = WalkSpeed;
                     }
                 }
             }
