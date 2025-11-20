@@ -9,11 +9,6 @@ public class FirstPersonController : MonoBehaviour
     //camera starting position
     private Vector3 CameraInitialPos;
 
-    public GameObject Visor;
-    //visor starting position
-    private Vector3 VisorInitialPos;
-
-
     public GameObject PlayerMesh;
     //initial pos and scales
     private Vector3 PlayerInitialScale = new Vector3(1, 1, 1);
@@ -47,8 +42,15 @@ public class FirstPersonController : MonoBehaviour
     [Header("Other Useful Settings")]
     public float MouseSensitivity = 1f;
     public float JumpIntensity = 4;
+    public float GravityIntensity = -15f;
 
-    private float CrouchHeight = 0.5f;
+    //gravity
+    private float GroundedVerticalSpeed = -1f;
+    private float VerticalSpeed = -1f;
+
+    //how fast you crouch and uncrouch
+    public float CrouchTransitionSpeed = 10f;
+    private readonly float CrouchHeight = 0.5f;
 
     //character controller component
     private CharacterController cc;
@@ -70,11 +72,6 @@ public class FirstPersonController : MonoBehaviour
     //vector that determines movement direction
     private Vector3 Movement;
 
-    //gravity intensity and the actual force pushing the player down
-    private float GravityIntensity = -9.81f;
-    private float GroundedVerticalSpeed = -1f;
-    private float VerticalSpeed = -1f;
-
     void Start()
     {
         cc = GetComponent<CharacterController>();
@@ -83,18 +80,16 @@ public class FirstPersonController : MonoBehaviour
         Cursor.visible = false;
 
         CameraInitialPos = MainCamera.transform.localPosition;
-        VisorInitialPos = Visor.transform.localPosition;
     }
 
     void Crouch()
     {
         //moves the camera, visor/eyes, and scales the player mesh and CharacterController down
-        MainCamera.transform.localPosition = Vector3.zero;
-        Visor.transform.localPosition = new Vector3(VisorInitialPos.x, MainCamera.transform.localPosition.y, VisorInitialPos.z);
-        PlayerMesh.transform.localPosition = new Vector3(PlayerInitialPos.x, PlayerPosCrouch, PlayerInitialPos.z);
-        PlayerMesh.transform.localScale = new Vector3(PlayerInitialScale.x, PlayerScaleCrouch, PlayerInitialScale.z);
-        cc.height = ccCrouchHeight;
-        cc.center = ccCrouchPos;
+        MainCamera.transform.localPosition = Vector3.Lerp(MainCamera.transform.localPosition, Vector3.zero, CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localPosition = Vector3.Lerp(PlayerMesh.transform.localPosition, new Vector3(PlayerInitialPos.x, PlayerPosCrouch, PlayerInitialPos.z), CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localScale = Vector3.Lerp(PlayerMesh.transform.localScale, new Vector3(PlayerInitialScale.x, PlayerScaleCrouch, PlayerInitialScale.z), CrouchTransitionSpeed * Time.deltaTime);
+        cc.height = Mathf.Lerp(cc.height, ccCrouchHeight, CrouchTransitionSpeed * Time.deltaTime);
+        cc.center = Vector3.Lerp(cc.center, ccCrouchPos, CrouchTransitionSpeed * Time.deltaTime);
 
         //clamps the player speed
         if (Speed <= CrouchSpeed)
@@ -118,13 +113,12 @@ public class FirstPersonController : MonoBehaviour
 
     void Run()
     {
-        //moves the camera, visor/eyes, the player mesh and CharacterController back to their original transforms
-        MainCamera.transform.localPosition = CameraInitialPos;
-        Visor.transform.localPosition = VisorInitialPos;
-        PlayerMesh.transform.localPosition = PlayerInitialPos;
-        PlayerMesh.transform.localScale = PlayerInitialScale;
-        cc.height = ccInitialHeight;
-        cc.center = ccInitialPos;
+        //moves the camera, the player mesh and CharacterController back to their original transforms
+        MainCamera.transform.localPosition = Vector3.Lerp(MainCamera.transform.localPosition, CameraInitialPos, CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localPosition = Vector3.Lerp(PlayerMesh.transform.localPosition, PlayerInitialPos, CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localScale = Vector3.Lerp(PlayerMesh.transform.localScale, PlayerInitialScale, CrouchTransitionSpeed * Time.deltaTime);
+        cc.height = Mathf.Lerp(cc.height, ccInitialHeight, CrouchTransitionSpeed * Time.deltaTime);
+        cc.center = Vector3.Lerp(cc.center, ccInitialPos, CrouchTransitionSpeed * Time.deltaTime);
 
         if (Speed >= RunSpeed)
         {
@@ -146,12 +140,11 @@ public class FirstPersonController : MonoBehaviour
 
     void Walk()
     {
-        MainCamera.transform.localPosition = CameraInitialPos;
-        Visor.transform.localPosition = VisorInitialPos;
-        PlayerMesh.transform.localPosition = PlayerInitialPos;
-        PlayerMesh.transform.localScale = PlayerInitialScale;
-        cc.height = ccInitialHeight;
-        cc.center = ccInitialPos;
+        MainCamera.transform.localPosition = Vector3.Lerp(MainCamera.transform.localPosition, CameraInitialPos, CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localPosition = Vector3.Lerp(PlayerMesh.transform.localPosition, PlayerInitialPos, CrouchTransitionSpeed * Time.deltaTime);
+        PlayerMesh.transform.localScale = Vector3.Lerp(PlayerMesh.transform.localScale, PlayerInitialScale, CrouchTransitionSpeed * Time.deltaTime);
+        cc.height = Mathf.Lerp(cc.height, ccInitialHeight, CrouchTransitionSpeed * Time.deltaTime);
+        cc.center = Vector3.Lerp(cc.center, ccInitialPos, CrouchTransitionSpeed * Time.deltaTime);
 
         if (cc.isGrounded)
         {
