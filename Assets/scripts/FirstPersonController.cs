@@ -75,13 +75,17 @@ public class FirstPersonController : MonoBehaviour
                 {
                     MainCamera.transform.localPosition = Vector3.zero;
 
-                    if(Speed <= CrouchSpeed)
+                    if (Speed <= CrouchSpeed)
                     {
                         Speed = CrouchSpeed;
                     }
-                    else
+
+                    if (cc.isGrounded)
                     {
-                        Speed -= SpeedIntensityChange * Time.deltaTime;
+                        if(!(Speed <= CrouchSpeed))
+                        {
+                            Speed -= SpeedIntensityChange * Time.deltaTime;
+                        }
                     }
                 }
                 else
@@ -92,9 +96,13 @@ public class FirstPersonController : MonoBehaviour
                     {
                         Speed = RunSpeed;
                     }
-                    else
+
+                    if (cc.isGrounded)
                     {
-                        Speed += SpeedIntensityChange * Time.deltaTime;
+                        if (!(Speed >= RunSpeed))
+                        {
+                            Speed += SpeedIntensityChange * Time.deltaTime;
+                        }
                     }
                 }
                 
@@ -108,9 +116,13 @@ public class FirstPersonController : MonoBehaviour
                     {
                         Speed = RunSpeed;
                     }
-                    else
+
+                    if (cc.isGrounded)
                     {
-                        Speed += SpeedIntensityChange * Time.deltaTime;
+                        if(!(Speed >= RunSpeed))
+                        {
+                            Speed += SpeedIntensityChange * Time.deltaTime;
+                        }
                     }
                 }
             }
@@ -119,17 +131,21 @@ public class FirstPersonController : MonoBehaviour
             {
                 MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
 
-                if(Speed > WalkSpeed - 0.1f && Speed < WalkSpeed + 0.1f)
+                if (Speed > WalkSpeed - 0.1f || Speed < WalkSpeed + 0.1f)
                 {
                     Speed = WalkSpeed;
                 }
-                else if(Speed > WalkSpeed)
+
+                if (cc.isGrounded)
                 {
-                    Speed -= SpeedIntensityChange * Time.deltaTime;
-                }
-                else if(Speed < WalkSpeed)
-                {
-                    Speed += SpeedIntensityChange * Time.deltaTime;
+                    if (Speed > WalkSpeed)
+                    {
+                        Speed -= SpeedIntensityChange * Time.deltaTime;
+                    }
+                    else if (Speed < WalkSpeed)
+                    {
+                        Speed += SpeedIntensityChange * Time.deltaTime;
+                    }
                 }
             }
 

@@ -3531,6 +3531,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 330585545}
+  Speed: 0
   WalkSpeed: 3
   RunSpeed: 6
   CrouchSpeed: 1
