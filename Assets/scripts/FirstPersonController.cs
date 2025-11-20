@@ -15,8 +15,8 @@ public class FirstPersonController : MonoBehaviour
     public GameObject PlayerMesh;
     private Vector3 PlayerInitialScale = new Vector3(1, 1, 1);
     private Vector3 PlayerInitialPos = new Vector3(0, 0, 0);
-    private float PlayerPosCrouch = -0.5f;
-    private float PlayerScaleCrouch = 0.5f;
+    private float PlayerPosCrouch = -0.3f;
+    private float PlayerScaleCrouch = 0.7f;
 
     private int ccCrouchHeight = 1;
     private int ccInitialHeight = 2;
@@ -42,8 +42,9 @@ public class FirstPersonController : MonoBehaviour
     [Header("Other Useful Settings")]
     public float MouseSensitivity = 2f;
     public float JumpIntensity = 4;
-    public float CrouchHeight = 0.5f;
 
+
+    private float CrouchHeight = 0.5f;
 
     //character controller component
     private CharacterController cc;
@@ -103,6 +104,7 @@ public class FirstPersonController : MonoBehaviour
             }
         }
 
+        //bools to view in the inspector (for testing and such)
         isCrouched = true;
         isWalking = false;
         isRunning = false;
