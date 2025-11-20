@@ -52,6 +52,7 @@ public class FirstPersonController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+
     void Update()
     {
         H = Input.GetAxisRaw("Horizontal");
@@ -157,11 +158,12 @@ public class FirstPersonController : MonoBehaviour
         }
 
         //unlocks the mouse
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if(Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             InputAllowed = false;
+            Time.timeScale = 0;
         }
         //locks the mouse
         else if(Input.GetMouseButtonDown(0))
@@ -169,6 +171,7 @@ public class FirstPersonController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             InputAllowed = true;
+            Time.timeScale = 1;
         }
     }
 

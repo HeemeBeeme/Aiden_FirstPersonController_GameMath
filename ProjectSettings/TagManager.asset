@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Feet
   - Ground
+  - Visor
+  - Platform
   layers:
   - Default
   - TransparentFX
