@@ -6,23 +6,28 @@ public class FirstPersonController : MonoBehaviour
 {
 
     public Camera MainCamera;
+    //camera starting position
+    private Vector3 CameraInitialPos;
 
     public GameObject Visor;
-    private float VisorPosInitialX = 0f;
-    private float VisorPosInitialZ = 0.264f;
+    //visor starting position
+    private Vector3 VisorInitialPos;
 
 
     public GameObject PlayerMesh;
+    //initial pos and scales
     private Vector3 PlayerInitialScale = new Vector3(1, 1, 1);
     private Vector3 PlayerInitialPos = new Vector3(0, 0, 0);
     private float PlayerPosCrouch = -0.3f;
     private float PlayerScaleCrouch = 0.7f;
 
+    //crouch heights
     private int ccCrouchHeight = 1;
     private int ccInitialHeight = 2;
     private Vector3 ccCrouchPos = new Vector3(0, -0.5f, 0);
     private Vector3 ccInitialPos = new Vector3(0, 0, 0);
 
+    //bools to view in the inspector (for testing and such)
     public bool isCrouched = false;
     public bool isRunning = false;
     public bool isWalking = true;
@@ -42,7 +47,6 @@ public class FirstPersonController : MonoBehaviour
     [Header("Other Useful Settings")]
     public float MouseSensitivity = 1f;
     public float JumpIntensity = 4;
-
 
     private float CrouchHeight = 0.5f;
 
@@ -77,13 +81,16 @@ public class FirstPersonController : MonoBehaviour
         Speed = WalkSpeed;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        CameraInitialPos = MainCamera.transform.localPosition;
+        VisorInitialPos = Visor.transform.localPosition;
     }
 
     void Crouch()
     {
         //moves the camera, visor/eyes, and scales the player mesh and CharacterController down
         MainCamera.transform.localPosition = Vector3.zero;
-        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        Visor.transform.localPosition = new Vector3(VisorInitialPos.x, MainCamera.transform.localPosition.y, VisorInitialPos.z);
         PlayerMesh.transform.localPosition = new Vector3(PlayerInitialPos.x, PlayerPosCrouch, PlayerInitialPos.z);
         PlayerMesh.transform.localScale = new Vector3(PlayerInitialScale.x, PlayerScaleCrouch, PlayerInitialScale.z);
         cc.height = ccCrouchHeight;
@@ -104,7 +111,6 @@ public class FirstPersonController : MonoBehaviour
             }
         }
 
-        //bools to view in the inspector (for testing and such)
         isCrouched = true;
         isWalking = false;
         isRunning = false;
@@ -113,8 +119,8 @@ public class FirstPersonController : MonoBehaviour
     void Run()
     {
         //moves the camera, visor/eyes, the player mesh and CharacterController back to their original transforms
-        MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
-        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        MainCamera.transform.localPosition = CameraInitialPos;
+        Visor.transform.localPosition = VisorInitialPos;
         PlayerMesh.transform.localPosition = PlayerInitialPos;
         PlayerMesh.transform.localScale = PlayerInitialScale;
         cc.height = ccInitialHeight;
@@ -140,8 +146,8 @@ public class FirstPersonController : MonoBehaviour
 
     void Walk()
     {
-        MainCamera.transform.localPosition = new Vector3(0, CrouchHeight, 0);
-        Visor.transform.localPosition = new Vector3(VisorPosInitialX, MainCamera.transform.localPosition.y, VisorPosInitialZ);
+        MainCamera.transform.localPosition = CameraInitialPos;
+        Visor.transform.localPosition = VisorInitialPos;
         PlayerMesh.transform.localPosition = PlayerInitialPos;
         PlayerMesh.transform.localScale = PlayerInitialScale;
         cc.height = ccInitialHeight;
